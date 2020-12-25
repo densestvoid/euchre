@@ -23,6 +23,33 @@ func teamsToGamesCombos(teams []*Team) []*Game {
 	return games
 }
 
+func teamsToRoundsCombos(teams []*Team, round *Round) []*Round {
+	if len(teams) % 2 != 0 || len(teams) == 0 {
+		return []*Round{round}
+	}
+
+	team := teams[0]
+	newTeams := NewTeams(teams)[1:]
+
+	var rounds []*Round
+	for i, opponents := range newTeams {
+		game := &Game{team, opponents}
+		if !game.valid() {
+			continue
+		}
+
+		var newRound = &Round{}
+		newRound.Copy(round)
+
+		nextTeams := NewTeams(newTeams)
+		nextTeams = append(nextTeams[:i], nextTeams[i+1:]...)
+
+		newRound.games = append(newRound.games, game)
+		rounds = append(rounds, teamsToRoundsCombos(nextTeams, newRound)...)
+	}
+	return rounds
+}
+
 func gamesToRoundsCombos(numPlayers int, games []*Game, baseRound *Round) []*Round {
 	if baseRound == nil {
 		baseRound = &Round{numPlayers: numPlayers}

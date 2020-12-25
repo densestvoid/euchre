@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func in(playersA []int, playersB []int) bool {
 	for _, playerA := range playersA {
@@ -64,18 +67,192 @@ func fillBracket(teams []*Team, b *Bracket) *Bracket {
 const numPlayers = 4
 
 func main() {
-	// fmt.Println("Players:", numPlayers)
-	// teams := playerToTeamCombos(numPlayers)
-	// fmt.Println("Teams:", len(teams))
-	// games := teamsToGamesCombos(teams)
-	// fmt.Println("Games:", len(games))
-	// rounds := gamesToRoundsCombos(numPlayers, games, nil)
-	// fmt.Println("Rounds:", len(rounds))
-	// brackets := roundsToBracketsCombos(numPlayers, rounds, nil)
-	// fmt.Println(brackets)
+	teamGroupings := [][]*Team{
+		{
+			{1,2},
+			{3,4},
+			{5,6},
+			{7,8},
+			{9,10},
+			{11,12},
+			{13,14},
+			{15,16},
+		},
+		{
+			{1,3},
+			{2,4},
+			{5,7},
+			{6,8},
+			{9,11},
+			{10,12},
+			{13,15},
+			{14,16},
+		},
+		{
+			{1,4},
+			{2,3},
+			{5,8},
+			{6,7},
+			{9,12},
+			{10,11},
+			{13,16},
+			{14,15},
+		},
+		{
+			{1,5},
+			{2,6},
+			{3,7},
+			{4,8},
+			{9,13},
+			{10,14},
+			{11,15},
+			{12,16},
+		},
+		{
+			{1,6},
+			{2,5},
+			{3,8},
+			{4,7},
+			{9,14},
+			{10,13},
+			{11,16},
+			{12,15},
+		},
+		{
+			{1,7},
+			{2,8},
+			{3,5},
+			{4,6},
+			{9,15},
+			{10,16},
+			{11,13},
+			{12,14},
+		},
+		{
+			{1,8},
+			{2,7},
+			{3,6},
+			{4,5},
+			{9,16},
+			{10,15},
+			{11,14},
+			{12,13},
+		},
+		{
+			{1,9},
+			{2,10},
+			{3,11},
+			{4,12},
+			{5,13},
+			{6,14},
+			{7,15},
+			{8,16},
+		},
+		{
+			{1,10},
+			{2,9},
+			{3,12},
+			{4,11},
+			{5,14},
+			{6,13},
+			{7,16},
+			{8,15},
+		},
+		{
+			{1,11},
+			{2,12},
+			{3,9},
+			{4,10},
+			{5,15},
+			{6,16},
+			{7,13},
+			{8,14},
+		},
+		{
+			{1,12},
+			{2,11},
+			{3,10},
+			{4,9},
+			{5,16},
+			{6,15},
+			{7,14},
+			{8,13},
+		},
+		{
+			{1,13},
+			{2,14},
+			{3,15},
+			{4,16},
+			{5,9},
+			{6,10},
+			{7,11},
+			{8,12},
+		},
+		{
+			{1,14},
+			{2,13},
+			{3,16},
+			{4,15},
+			{5,10},
+			{6,9},
+			{7,12},
+			{8,11},
+		},
+		{
+			{1,15},
+			{2,16},
+			{3,13},
+			{4,14},
+			{5,11},
+			{6,12},
+			{7,9},
+			{8,10},
+		},
+		{
+			{1,16},
+			{2,15},
+			{3,14},
+			{4,13},
+			{5,12},
+			{6,11},
+			{7,10},
+			{8,9},
+		},
+	}
 
-	teams := playerToTeamCombos(numPlayers)
-	fmt.Println(fillBracket(teams, &Bracket{}))
+	var roundCombosPerTeamGroupings [][]*Round
+	for _, teamGrouping := range teamGroupings {
+		roundCombosPerTeamGroupings = append(roundCombosPerTeamGroupings, teamsToRoundsCombos(teamGrouping, &Round{numPlayers:16}))
+	}
+	
+	fmt.Println(bracketFromRounds(&Bracket{numPlayers:16}, roundCombosPerTeamGroupings))
+}
+
+func NewRoundCombos(combos [][]*Round) [][]*Round{
+	return append([][]*Round{}, combos...)
+}
+
+func bracketFromRounds(bracket *Bracket, roundCombos [][]*Round) *Bracket{
+	if len(roundCombos) == 0 {
+		return bracket
+	}
+
+	rounds := roundCombos[0]
+	newRoundCombos := NewRoundCombos(roundCombos[1:])
+
+	start := time.Now()
+	for _, round := range rounds {
+		newBracket := NewBracket(bracket)
+		newBracket.rounds = append(newBracket.rounds, round)
+		if newBracket.valid() {
+			b := bracketFromRounds(newBracket, newRoundCombos)
+			if b != nil {
+				return b
+			}
+		}
+	}
+	fmt.Println(len(bracket.rounds), time.Now().Sub(start))
+	return nil
 }
 
 func roundsFromTeamPerms(perms [][]*Team) []*Round {

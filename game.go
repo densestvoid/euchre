@@ -46,14 +46,14 @@ func (g *Game) hasPlayed(hasPlayed [][]int) [][]int {
 		return hasPlayed
 	}
 
-	hasPlayed[g.teamA.playerA][g.teamB.playerA] += 1
-	hasPlayed[g.teamA.playerA][g.teamB.playerB] += 1
-	hasPlayed[g.teamA.playerB][g.teamB.playerA] += 1
-	hasPlayed[g.teamA.playerB][g.teamB.playerB] += 1
-	hasPlayed[g.teamB.playerA][g.teamA.playerA] += 1
-	hasPlayed[g.teamB.playerA][g.teamA.playerB] += 1
-	hasPlayed[g.teamB.playerB][g.teamA.playerA] += 1
-	hasPlayed[g.teamB.playerB][g.teamA.playerB] += 1
+	hasPlayed[g.teamA.playerA-1][g.teamB.playerA-1] += 1
+	hasPlayed[g.teamA.playerA-1][g.teamB.playerB-1] += 1
+	hasPlayed[g.teamA.playerB-1][g.teamB.playerA-1] += 1
+	hasPlayed[g.teamA.playerB-1][g.teamB.playerB-1] += 1
+	hasPlayed[g.teamB.playerA-1][g.teamA.playerA-1] += 1
+	hasPlayed[g.teamB.playerA-1][g.teamA.playerB-1] += 1
+	hasPlayed[g.teamB.playerB-1][g.teamA.playerA-1] += 1
+	hasPlayed[g.teamB.playerB-1][g.teamA.playerB-1] += 1
 
 	return hasPlayed
 }
